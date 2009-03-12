@@ -3,7 +3,7 @@
 if (!defined('MEDIAWIKI') || $wgHashedUploadDirectory)
 {
 	echo <<<EOT
-	To install the MeanEditor extension, apply the patch to EditPage.php, disable $wgHashedUploadDirectory and put the following line in LocalSettings.php:
+	To install the MeanEditor extension disable wgHashedUploadDirectory and put the following line in LocalSettings.php:
 	require_once( "$IP/extensions/MeanEditor/MeanEditor.php" );
 	
 	See README-MeanEditor.txt for more information (if your wiki is not reached through /mediawiki you will need to make some changes).
