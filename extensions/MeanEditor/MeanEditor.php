@@ -227,7 +227,7 @@ function meaneditor_html2wiki($article, $user, &$edit_context, &$html_text)
 	return false;
 }
 
-function meaneditor_showBox(&$edit_context, $html_text, $rows, $cols, $ew, $hidden)
+function meaneditor_showBox(&$edit_context, $html_text, $rows, $cols, $ew)
 {
 	global $wgOut;
 	$wgOut->addHtml('<link rel="stylesheet" type="text/css" media="screen" href="wymeditor/styles.css" />
@@ -249,7 +249,7 @@ function meaneditor_showBox(&$edit_context, $html_text, $rows, $cols, $ew, $hidd
 	                </script>');
 	$wgOut->addHTML( <<<END
 <textarea tabindex='1' accesskey="," name="wpTextbox1" id="wpTextbox1" class="wymeditor" rows='{$rows}'
-cols='{$cols}'{$ew} $hidden></textarea>
+cols='{$cols}'{$ew}></textarea>
 END
 	);
 	return false;

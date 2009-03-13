@@ -500,7 +500,7 @@ END
 		$this->noVisualEditor = wfRunHooks('EditPage::wiki2html', array($this->mArticle, $wgUser, &$this, &$html_text));
 	}
 	if (!$this->noVisualEditor && !$this->userWantsTraditionalEditor) {
-		$this->noVisualEditor = wfRunHooks('EditPage::showBox', array(&$this, $html_text, $rows, $cols, $ew, $hidden));
+		$this->noVisualEditor = wfRunHooks('EditPage::showBox', array(&$this, $html_text, $rows, $cols, $ew));
 	}
 	if (!$this->noVisualEditor && !$this->userWantsTraditionalEditor) {
 		$wgOut->addHTML("<input type='hidden' value=\"0\" name=\"wpNoVisualEditor\" />\n");
