@@ -1,3 +1,11 @@
+<?php
+putenv('MW_INSTALL_PATH=..');
+require_once '../includes/WebStart.php';
+$wiki_path = $wgScript . '/';
+#$images_path = $base_path + '/images/';
+$images_path = $wgUploadDirectory . '/';
+?>
+
 var context_is_open = 0;  // JT: A modal context dialog is open
 
 if(!WYM_STRINGS) var WYM_STRINGS = new Array();
@@ -1174,19 +1182,19 @@ Wymeditor.prototype.addCssRules = function(doc, aCss) {
 
 Wymeditor.prototype.computeBasePath = function() {
   return jQuery(jQuery.grep(jQuery('script'), function(s){
-    return (s.src && s.src.match(/jquery\.wymeditor(\.pack){0,1}\.js(\?.*)?$/ ))
-  })).attr('src').replace(/jquery\.wymeditor(\.pack){0,1}\.js(\?.*)?$/, '');
+    return (s.src && s.src.match(/jquery\.wymeditor(\.pack){0,1}\.js.php(\?.*)?$/ ))
+  })).attr('src').replace(/jquery\.wymeditor(\.pack){0,1}\.js.php(\?.*)?$/, '');
 };
 
 Wymeditor.prototype.computeWymPath = function() {
   return jQuery(jQuery.grep(jQuery('script'), function(s){
-    return (s.src && s.src.match(/jquery\.wymeditor(\.pack){0,1}\.js(\?.*)?$/ ))
+    return (s.src && s.src.match(/jquery\.wymeditor(\.pack){0,1}\.js.php(\?.*)?$/ ))
   })).attr('src');
 };
 
 Wymeditor.prototype.computeJqueryPath = function() {
   return jQuery(jQuery.grep(jQuery('script'), function(s){
-    return (s.src && s.src.match(/jquery(-(.*)){0,1}(\.pack){0,1}\.js(\?.*)?$/ ))
+    return (s.src && s.src.match(/jquery(-(.*)){0,1}(\.pack){0,1}\.js.php(\?.*)?$/ ))
   })).attr('src');
 };
 
@@ -1396,9 +1404,9 @@ function WYM_INIT_DIALOG(his_wym) {
     	if(dialogType == WYM_DIALOG_WIKILINK) {
 		var url = jQuery(selected).attr(WYM_HREF);
 		if (url) {
-			if (url.indexOf('/mediawiki/index.php/') == -1)
+			if (url.indexOf('<?php echo $wiki_path; ?>') == -1)
 				jQuery(wym._options.hrefSelector).val('[External link, do not edit here]');
-			else jQuery(wym._options.hrefSelector).val(url.slice(21));
+			else jQuery(wym._options.hrefSelector).val(url.slice(<?php echo strlen($wiki_path);  ?>));
 		} else {
 			jQuery(wym._options.hrefSelector).val(testo);
 		}
@@ -1436,7 +1444,7 @@ function WYM_INIT_DIALOG(his_wym) {
                 }
             }
             if(link) {
-	    	link.attr(WYM_HREF, dialogType == WYM_DIALOG_WIKILINK ? "/mediawiki/index.php/" + sUrl : sUrl);
+		link.attr(WYM_HREF, dialogType == WYM_DIALOG_WIKILINK ? "<?php echo $wiki_path; ?>" + sUrl : sUrl);
 		//link.attr(WYM_TITLE, jQuery(wym._options.titleSelector).val());
             }
         }
@@ -1460,7 +1468,7 @@ function WYM_INIT_DIALOG(his_wym) {
                 }
             }
             if(image) {
-                image.attr(WYM_SRC, "/jacopo/mediawiki/images/"+sUrl);
+		image.attr(WYM_SRC, "<?php echo $images_path ?>"+sUrl);
                 //image.attr(WYM_TITLE, jQuery(wym._options.titleSelector).val());
                 image.attr(WYM_ALT, sUrl);
             }
