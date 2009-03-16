@@ -263,13 +263,18 @@ function recent_images($rsargs)
 	$dbw =& wfGetDB( DB_MASTER );
 	$res=$dbw->query('select img_name from '.$wgDBprefix.'image where img_user='.$u->getId().';');
 	$return_text='';
+	$return_empty = true;
 	for($i=0;$i<$res->numRows();$i++)
 	{
 		$ret=$res->fetchRow();
 #		$return_text=$return_text.'<tr><td><img src="'.$wgUploadPath.'/'.$ret['img_name'].'" height=100% width=100% onclick="div=document.getElementById(\'image_name\'); div.value=\''.$ret['img_name']+'\';" /></td></tr>';
 		$return_text=$return_text.'<tr><td><img src="'.$wgUploadPath.'/'.$ret['img_name'].'" height=100% width=100% onclick="div=document.getElementById(\'image_name\'); div.value=\''.$ret['img_name'].'\';" /></td></tr><tr><td>'.$ret['img_name'].'</td></tr>';
+		$return_empty = false;
 	}
-	return $return_text;
+	if ($return_empty) {
+		wfLoadExtensionMessages('MeanEditor');
+		return '<tr><td colspan="2"><strong>' . wfMsgWikiHtml('no_recent_images') . '</strong>' . ($u->isLoggedIn() ? '' : '<br />'. wfMsgWikiHtml('try_login')) . '</td></tr>';
+	} else return $return_text;
 }
 $wgAjaxExportList[] = "recent_images";
 
