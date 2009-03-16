@@ -17,15 +17,17 @@ We designed MeanEditor with existing wikis (above all, Wikipedia) in mind. We ho
 
 If no advanced features are needed, MeanEditor is a good choice even for a single-editor wiki.
 
-=== Installing ===
-0) Install Mediawiki 1.14 in /var/www/mediawiki (see below if you are installing in another directory)
-1) Unpack the tar in /var/www/mediawiki. This will create the jquery, wymeditor and extensions/MeanEditor directories.
+=== Installing using a downloaded file ===
+0) Install Mediawiki 1.14
+1) Unpack the tar in the MediaWiki install directory. This will create the extensions/MeanEditor directory.
 2) Disable $wgHashedUploadDirectory as suggested in LocalSettings.php
 3) Add to LocalSettings.php
  require_once( "$IP/extensions/MeanEditor/MeanEditor.php" );
 
-If you wish to install in another subdirectory or enable short paths, you will have to replace "/mediawiki/" as needed in wymeditor/jquery.wymeditor.pack.js
-Of course, /var/www is just an example for your DocumentRoot.
+=== Installing from the github repository ===
+0) Install Mediawiki 1.14 or later
+1) create the extensions/MeanEditor directory and cd into it
+2) see <http://github.com/jacopo/meaneditor/> and clone from the repository. The "master" branch will usually have the most recent version, which might require an updated MediaWiki version from SVN. If the "master" code doesn't work look for a "mwNN" branch (e.g. "mw14" for MediaWiki 1.14.*).
 
 === Details ===
 MeanEditor is best described as "A quick and dirty hack with a couple of interesting properties". It supports only a very limited subset of the Wiki language, but does its job right. (Well, it tries)
@@ -64,14 +66,13 @@ To be implemented only for display:
 
 === Known Bugs ===
 * Squeezes multiple newlines in one, does not preserve redundant whitespace (again, this may be a good thing)
-* The Javascript code has hardcoded page and image URLs. Also, for some functions URL are shown in the interface. It will still need polishing.
 * Requires $wgHashedUploadDirectory to be off (should be easy to solve)
 * Context dialog doesn't work if you change selection (should it?)
 * Unsupported feature detection is simply draconic
 * Unnecessarily escapes characters like tilde in URLs and converts HTML entities (WYMeditor or browser problem?)
 * Unicode handling is untested
-* Preview passes HTML to the editor. We try to convert it to wikicode as soon as possible, but some hooks or preview functions may be confused.
-* If you are in the middle of a visual editing and something strange happens, we revert to traditional editing. There might be cases in which you get HTML instead of wikicode and have to start over. This should be a very rare case, but existing extensions need reviewing.
+* Preview passes HTML to the editor. We try to convert it to wikicode as soon as possible, but it is possible that some hooks or preview functions may get confused. If you are in the middle of a visual editing and something strange happens, we revert to traditional editing. There might be cases in which you get HTML instead of wikicode and have to start over. This should be a very rare case, but existing extensions need reviewing.
+* Short paths have not been tested.
 
 === Security ===
 Saved text passes through usual Mediawiki checks.
