@@ -230,10 +230,10 @@ function meaneditor_html2wiki($article, $user, &$edit_context, &$html_text)
 function meaneditor_showBox(&$edit_context, $html_text, $rows, $cols, $ew)
 {
 	global $wgOut;
-	$wgOut->addHtml('<link rel="stylesheet" type="text/css" media="screen" href="wymeditor/styles.css" />
-	                 <link rel="stylesheet" type="text/css" media="screen" href="wymeditor/skins/default/screen.css" />
-	                 <script type="text/javascript" src="jquery/jquery.js"></script>
-	                 <script type="text/javascript" src="wymeditor/jquery.wymeditor.pack.js.php"></script>');
+	$wgOut->addHtml('<link rel="stylesheet" type="text/css" media="screen" href="extensions/MeanEditor/wymeditor/styles.css" />
+	                 <link rel="stylesheet" type="text/css" media="screen" href="extensions/MeanEditor/wymeditor/skins/default/screen.css" />
+	                 <script type="text/javascript" src="extensions/MeanEditor/jquery/jquery.js"></script>
+	                 <script type="text/javascript" src="extensions/MeanEditor/wymeditor/jquery.wymeditor.pack.js.php"></script>');
 	$wgOut->addHtml('<script type="text/javascript">
 	                function responder(e)
 	                {

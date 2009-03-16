@@ -1,6 +1,6 @@
 <?php
-putenv('MW_INSTALL_PATH=..');
-require_once '../includes/WebStart.php';
+putenv('MW_INSTALL_PATH=../../..');
+require_once '../../../includes/WebStart.php';
 $wiki_path = $wgScript . '/';
 #$images_path = $base_path + '/images/';
 $images_path = $wgUploadDirectory . '/';
