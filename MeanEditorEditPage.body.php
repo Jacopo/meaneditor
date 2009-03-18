@@ -1,4 +1,4 @@
-<?php
+/<?php
 /**
  * Unfortunately, we have to override entire methods of EditPage
  * Search for "MeanEditor" to find our patches
@@ -206,9 +206,7 @@ class MeanEditorEditPage extends EditPage {
 			if ( $this->section != '' && $this->section != 'new' ) {
 				$matches = array();
 				if ( !$this->summary && !$this->preview && !$this->diff ) {
-					preg_match( "/^(=+)(.+)\\1/mi",
-						$this->textbox1,
-						$matches );
+					preg_match( "/^(=+)(.+)\\1/mi", $this->textbox1, $matches );
 					if ( !empty( $matches[2] ) ) {
 						global $wgParser;
 						$this->summary = "/* " .
@@ -275,7 +273,7 @@ class MeanEditorEditPage extends EditPage {
 		$classes = array(); // Textarea CSS
 		if ( $this->mTitle->getNamespace() == NS_MEDIAWIKI ) {
 			# Show a warning if editing an interface message
-			$wgOut->addWikiMsg( 'editinginterface' );
+			$wgOut->wrapWikiMsg( "<div class='mw-editinginterface'>\n$1</div>", 'editinginterface' );
 		} elseif ( $this->mTitle->isProtected( 'edit' ) ) {
 			# Is the title semi-protected?
 			if ( $this->mTitle->isSemiProtected() ) {
@@ -294,17 +292,19 @@ class MeanEditorEditPage extends EditPage {
 		if ( $this->mTitle->isCascadeProtected() ) {
 			# Is this page under cascading protection from some source pages?
 			list($cascadeSources, /* $restrictions */) = $this->mTitle->getCascadeProtectionSources();
-			$notice = "$1\n";
-			if ( count($cascadeSources) > 0 ) {
+			$notice = "<div class='mw-cascadeprotectedwarning'>$1\n";
+			$cascadeSourcesCount = count( $cascadeSources );
+			if ( $cascadeSourcesCount > 0 ) {
 				# Explain, and list the titles responsible
 				foreach( $cascadeSources as $page ) {
 					$notice .= '* [[:' . $page->getPrefixedText() . "]]\n";
 				}
 			}
-			$wgOut->wrapWikiMsg( $notice, array( 'cascadeprotectedwarning', count($cascadeSources) ) );
+			$notice .= '</div>';
+			$wgOut->wrapWikiMsg( $notice, array( 'cascadeprotectedwarning', $cascadeSourcesCount ) );
 		}
 		if ( !$this->mTitle->exists() && $this->mTitle->getRestrictions( 'create' ) ) {
-			$wgOut->addWikiMsg( 'titleprotectedwarning' );
+			$wgOut->wrapWikiMsg( '<div class="mw-titleprotectedwarning">$1</div>', 'titleprotectedwarning' );
 		}
 
 		if ( $this->kblength === false ) {
@@ -330,6 +330,7 @@ class MeanEditorEditPage extends EditPage {
 
 		$cancel = $sk->makeKnownLink( $wgTitle->getPrefixedText(),
 				wfMsgExt('cancel', array('parseinline')) );
+		$separator = wfMsgExt( 'pipe-separator' , 'escapenoentities' );
 		$edithelpurl = Skin::makeInternalOrExternalUrl( wfMsgForContent( 'edithelppage' ));
 		$edithelp = '<a target="helpwindow" href="'.$edithelpurl.'">'.
 			htmlspecialchars( wfMsg( 'edithelp' ) ).'</a> '.
@@ -379,15 +380,15 @@ class MeanEditorEditPage extends EditPage {
 
 		$wgOut->addHTML( $this->editFormPageTop );
 
-		if ( $wgUser->getOption( 'previewontop' ) )
+		if ( $wgUser->getOption( 'previewontop' ) ) {
 			$this->displayPreviewArea( $previewOutput, true );
-
+		}
 
 		$wgOut->addHTML( $this->editFormTextTop );
 
 		# if this is a comment, show a subject line at the top, which is also the edit summary.
 		# Otherwise, show a summary field at the bottom
-		$summarytext = htmlspecialchars( $wgContLang->recodeForEdit( $this->summary ) ); # FIXME
+		$summarytext = $wgContLang->recodeForEdit( $this->summary );
 
 		# If a blank edit summary was previously provided, and the appropriate
 		# user preference is active, pass a hidden tag as wpIgnoreBlankSummary. This will stop the
@@ -401,7 +402,22 @@ class MeanEditorEditPage extends EditPage {
 		$autosumm = $this->autoSumm ? $this->autoSumm : md5( $this->summary );
 		$summaryhiddens .= Xml::hidden( 'wpAutoSummary', $autosumm );
 		if ( $this->section == 'new' ) {
-			$commentsubject="<span id='wpSummaryLabel'><label for='wpSummary'>{$subject}</label></span>\n<input tabindex='1' type='text' value=\"$summarytext\" name='wpSummary' id='wpSummary' maxlength='200' size='60' />{$summaryhiddens}<br />";
+			$commentsubject = '';
+			if ( !$wgRequest->getBool( 'nosummary' ) ) {
+				$commentsubject =
+					Xml::tags( 'label', array( 'for' => 'wpSummary' ), $subject );
+				$commentsubject =
+					Xml::tags( 'span', array( 'id' => 'wpSummaryLabel' ), $commentsubject );
+				$commentsubject .= '&nbsp;';
+				$commentsubject .= Xml::input( 'wpSummary',
+									60,
+									$summarytext,
+									array(
+										'id' => 'wpSummary',
+										'maxlength' => '200',
+										'tabindex' => '1'
+									) );
+			}
 			$editsummary = "<div class='editOptions'>\n";
 			global $wgParser;
 			$formattedSummary = wfMsgForContent( 'newsectionsummary', $wgParser->stripSectionName( $this->summary ) );
@@ -409,10 +425,37 @@ class MeanEditorEditPage extends EditPage {
 			$summarypreview = '';
 		} else {
 			$commentsubject = '';
-			$editsummary="<div class='editOptions'>\n<span id='wpSummaryLabel'><label for='wpSummary'>{$summary}</label></span>\n<input tabindex='2' type='text' value=\"$summarytext\" name='wpSummary' id='wpSummary' maxlength='200' size='60' />{$summaryhiddens}<br />";
-			$summarypreview = $summarytext && $this->preview ? "<div class=\"mw-summary-preview\">". wfMsg('summary-preview') .$sk->commentBlock( $this->summary, $this->mTitle )."</div>\n" : '';
+
+			$editsummary = Xml::tags( 'label', array( 'for' => 'wpSummary' ), $summary );
+			$editsummary =
+				Xml::tags( 'span', array( 'id' => 'wpSummaryLabel' ), $editsummary ) . ' ';
+				
+			$editsummary .= Xml::input( 'wpSummary',
+				60,
+				$summarytext,
+				array(
+					'id' => 'wpSummary',
+					'maxlength' => '200',
+					'tabindex' => '1'
+				) );
+			
+			// No idea where this is closed.
+			$editsummary = Xml::openElement( 'div', array( 'class' => 'editOptions' ) )
+							. $editsummary . '<br/>';
+				
+			$summarypreview = '';
+			if ( $summarytext && $this->preview ) {
+				$summarypreview =
+					Xml::tags( 'div',
+						array( 'class' => 'mw-summary-preview' ),
+						wfMsg( 'summary-preview' ) .
+							$sk->commentBlock( $this->summary, $this->mTitle )
+					);
+			}
 			$subjectpreview = '';
 		}
+		$commentsubject .= $summaryhiddens;
+
 
 		# Set focus to the edit box on load, except on preview or diff, where it would interfere with the display
 		if ( !$this->preview && !$this->diff ) {
@@ -442,15 +485,18 @@ class MeanEditorEditPage extends EditPage {
 		$recreate = '';
 		if ( $this->wasDeletedSinceLastEdit() ) {
 			if ( 'save' != $this->formtype ) {
-				$wgOut->addWikiMsg('deletedwhileediting');
+				$wgOut->wrapWikiMsg(
+					'<div class="error mw-deleted-while-editing">$1</div>',
+					'deletedwhileediting' );
 			} else {
-				// Hide the toolbar and edit area, use can click preview to get it back
+				// Hide the toolbar and edit area, user can click preview to get it back
 				// Add an confirmation checkbox and explanation.
 				$toolbar = '';
-				$recreate = $wgOut->parse( wfMsg( 'confirmrecreate',  $this->lastDelete->user_name , $this->lastDelete->log_comment ));
-				$recreate .=
-					"<br /><input tabindex='1' type='checkbox' value='1' name='wpRecreate' id='wpRecreate' />".
-					"<label for='wpRecreate' title='".wfMsg('tooltip-recreate')."'>". wfMsg('recreate')."</label>";
+				$recreate = '<div class="mw-confirm-recreate">' .
+						$wgOut->parse( wfMsg( 'confirmrecreate',  $this->lastDelete->user_name , $this->lastDelete->log_comment ) ) .
+						Xml::checkLabel( wfMsg( 'recreate' ), 'wpRecreate', 'wpRecreate', false,
+							array( 'title' => $sk->titleAttrib( 'recreate' ), 'tabindex' => 1, 'id' => 'wpRecreate' )
+						) . '</div>';
 			}
 		}
 
@@ -523,7 +569,7 @@ END
 		$wgOut->addHTML(
 "<div class='editButtons'>
 {$buttonshtml}
-	<span class='editHelp'>{$cancel} | {$edithelp}</span>
+	<span class='editHelp'>{$cancel}{$separator}{$edithelp}</span>
 </div><!-- editButtons -->
 </div><!-- editOptions -->");
 
