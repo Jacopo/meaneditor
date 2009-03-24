@@ -24,7 +24,8 @@ $wgExtensionCredits['other'][] = array(
 function deny_visual_because_of($reason, &$edit_context)
 {
 	global $wgOut;
-	$wgOut->addHTML('<p class="visual_editing_denied errorbox">The visual editor can\'t be used for this page. Most likely, it contains advanced or unsopported features. If you can, try editing smaller paragraphs.<br /><br />Reason: <em class="visual_editing_denied_reason">'.$reason.'</em></p>');
+	wfLoadExtensionMessages('MeanEditor');
+	$wgOut->addHTML('<p class="visual_editing_denied errorbox">' . wfMsg('no_visual') . '<em class="visual_editing_denied_reason">'.$reason.'</em></p>');
 	# FIXME: Doesn't work. Why?
 	#$edit_context->editFormTextBeforeContent .= '<p class="visual_editing_denied errorbox">The visual editor can\'t be used for this page. Most likely, it contains advanced or unsopported features. If you can, try editing smaller paragraphs.<br /><br />Reason: <em class="visual_editing_denied_reason">'.$reason.'</em></p>';
 	# Maybe add a page to gather feedback
@@ -35,11 +36,12 @@ function deny_visual_because_of($reason, &$edit_context)
 function meaneditor_wiki2html($article, $user, &$edit_context, &$wiki_text)
 {
 	global $wgUploadPath, $wgArticlePath;
+	wfLoadExtensionMessages('MeanEditor');
 	$meaneditor_page_src = str_replace('$1', '', $wgArticlePath);
 	
 	# Detect code sections (lines beginning with whitespace)
 	if (preg_match('/^[ \t]/m',$wiki_text))
-		return deny_visual_because_of('Whitespace found at line beginning. Code and preformatted sections are not supported.', $edit_context);
+		return deny_visual_because_of(wfMsg('reason_whitespace'), $edit_context);
 		
 	# Detect custom tags: only <br /> and references are supported at the moment
 	# TODO: expand the safe list
@@ -54,7 +56,7 @@ function meaneditor_wiki2html($article, $user, &$edit_context, &$wiki_text)
 	$wiki_text=str_replace('<ref>','__TEMP__TEMP__ref',$wiki_text);
 	$wiki_text=str_replace('</ref>','__TEMP__TEMP__cref',$wiki_text);
 	if (!((strpos($wiki_text, '<')===FALSE) && (strpos($wiki_text, '>')===FALSE)))
-		return deny_visual_because_of('Angle brackets &lt; or &gt; found. HTML and custom tags are not supported (exception: &lt;br /&gt;).', $edit_context);
+		return deny_visual_because_of(wfMsg('reason_tag'), $edit_context);
 	$wiki_text=str_replace('__TEMP__TEMP__br','<br />', $wiki_text);
 	$wiki_text=str_replace('__TEMP__TEMP__allreferences','references_here',$wiki_text);
 	$wiki_text=str_replace('__TEMP__TEMP__ref','<ref>',$wiki_text);
@@ -64,7 +66,7 @@ function meaneditor_wiki2html($article, $user, &$edit_context, &$wiki_text)
 	$unwanted_chars_at_beginning = array(':', ';');
 	foreach ($unwanted_chars_at_beginning as $uc)
 		if (preg_match('/^'.$uc.'/m',$wiki_text))
-			return deny_visual_because_of('Found a <b>' . $uc . '</b> at the beginning of a line. Definition lists and special indents are not supported.', $edit_context);
+			return deny_visual_because_of(wfMsg('reason_indent', $uc), $edit_context);
 	
 	# <hr>, from Parser.php... TODO: other regexps can be directly stolen from there
 	$wiki_text=preg_replace('/(^|\n)-----*/', '\\1<hr />', $wiki_text);
@@ -99,7 +101,7 @@ function meaneditor_wiki2html($article, $user, &$edit_context, &$wiki_text)
 
 	#Substitute [[ syntax (internal links)
 	if (preg_match('/\[\[([^|\]]*?):(.*?)\|(.*?)\]\]/',$wiki_text,$unwanted_matches))
-		return deny_visual_because_of('Special wikilinks like <b>'.$unwanted_matches[0].'</b> are not supported.', $edit_context);
+		return deny_visual_because_of(wfMsg('reason_special_link', $unwanted_matches[0]), $edit_context);
 	#Preserve #section links from the draconic feature detection
 	$wiki_text=preg_replace_callback('/\[\[(.*?)\|(.*?)\]\]/',
 		create_function('$matches', 'return "[[".str_replace("#","__TEMP_MEAN_hash",$matches[1])."|".str_replace("#","__TEMP_MEAN_hash",$matches[2])."]]";'),
@@ -133,7 +135,7 @@ function meaneditor_wiki2html($article, $user, &$edit_context, &$wiki_text)
 	$unwanted_chars = array('[', ']', '|', '{', '}', '#', '*');
 	foreach ($unwanted_chars as $uc)
 		if (!($unwanted_match = strpos($wiki_text, $uc) === FALSE))
-			return deny_visual_because_of('Found a <b>' . $uc . '</b>. Sounds like an unsupported feature.', $edit_context);
+			return deny_visual_because_of(wfMsg('reason_forbidden_char', $uc), $edit_context);
 
 	# Restore numbered entities
 	$wiki_text=str_replace('__TEMP__MEAN__nument','&#',$wiki_text);
@@ -300,6 +302,7 @@ $wgHooks['UserToggles'][] = 'toggle_visualeditor_preference';
 # Regular Editpage hooks
 function meaneditor_checkboxes(&$editpage, &$checkboxes, &$tabindex)
 {
+	wfLoadExtensionMessages('MeanEditor');
 	$checkboxes['want_traditional_editor'] = '';
 	$attribs = array(
 		'tabindex'  => ++$tabindex,
@@ -308,7 +311,7 @@ function meaneditor_checkboxes(&$editpage, &$checkboxes, &$tabindex)
 	);
 	$checkboxes['want_traditional_editor'] =
 		Xml::check( 'wpWantTraditionalEditor', $checked['want_traditional_editor'], $attribs ) .
-		"&nbsp;<label for='wpWantTraditionalEditor'>Force traditional code editing</label>";
+		"&nbsp;<label for='wpWantTraditionalEditor'>" . wfMsg('checkbox_force_traditional') . "</label>";
 	return true;
 }
 
