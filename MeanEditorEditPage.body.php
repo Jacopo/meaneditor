@@ -1,4 +1,4 @@
-/<?php
+<?php
 /**
  * Unfortunately, we have to override entire methods of EditPage
  * Search for "MeanEditor" to find our patches
