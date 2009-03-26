@@ -11,5 +11,6 @@ $messages['en'] = array(
 	'reason_indent' => 'Found a <b>$1</b> at the beginning of a line. Definition lists and special indents are not supported.',
 	'reason_forbidden_char' => 'Found a <b>$1</b>. Sounds like an unsupported feature.',
 	'reason_special_link' => 'Special wikilinks like <b>$1</b> are not supported.',
-	'checkbox_force_traditional' => 'Force traditional code editing'
+	'checkbox_force_traditional' => 'Force traditional code editing',
+	'recent_images_text' => 'Click <b>here</b> to show images you recently uploaded or type the name of the image. You can also <a href=\'$1\' target=\'_blank\'>upload a new image</a>'
 );

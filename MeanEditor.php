@@ -43,7 +43,7 @@ function meaneditor_wiki2html($article, $user, &$edit_context, &$wiki_text)
 	if (preg_match('/^[ \t]/m',$wiki_text))
 		return deny_visual_because_of(wfMsg('reason_whitespace'), $edit_context);
 		
-	# Detect custom tags: only <br /> and references are supported at the moment
+	# Detect custom tags: only <br />, super/sub-scripts and references are supported at the moment
 	# TODO: expand the safe list
 	# Especially problematic tags (do not even think about supporting them):
 	#      <p>  (would require special handling to disable normal paragraphing, confusing)
@@ -55,10 +55,18 @@ function meaneditor_wiki2html($article, $user, &$edit_context, &$wiki_text)
 	$wiki_text=str_replace('<references />','__TEMP__TEMP__allreferences',$wiki_text);
 	$wiki_text=str_replace('<ref>','__TEMP__TEMP__ref',$wiki_text);
 	$wiki_text=str_replace('</ref>','__TEMP__TEMP__cref',$wiki_text);
+	$wiki_text=str_replace('<sup>','__TEMP__TEMP__sup',$wiki_text);
+	$wiki_text=str_replace('</sup>','__TEMP__TEMP__csup',$wiki_text);
+	$wiki_text=str_replace('<sub>','__TEMP__TEMP__sub',$wiki_text);
+	$wiki_text=str_replace('</sub>','__TEMP__TEMP__csub',$wiki_text);
 	if (!((strpos($wiki_text, '<')===FALSE) && (strpos($wiki_text, '>')===FALSE)))
 		return deny_visual_because_of(wfMsg('reason_tag'), $edit_context);
 	$wiki_text=str_replace('__TEMP__TEMP__br','<br />', $wiki_text);
 	$wiki_text=str_replace('__TEMP__TEMP__allreferences','references_here',$wiki_text);
+	$wiki_text=str_replace('__TEMP__TEMP__sup','<sup>',$wiki_text);
+	$wiki_text=str_replace('__TEMP__TEMP__csup','</sup>',$wiki_text);
+	$wiki_text=str_replace('__TEMP__TEMP__sub','<sub>',$wiki_text);
+	$wiki_text=str_replace('__TEMP__TEMP__csub','</sub>',$wiki_text);
 	$wiki_text=str_replace('__TEMP__TEMP__ref','<ref>',$wiki_text);
 	$wiki_text=str_replace('__TEMP__TEMP__cref','</ref>',$wiki_text);
 	
@@ -231,21 +239,176 @@ function meaneditor_html2wiki($article, $user, &$edit_context, &$html_text)
 
 function meaneditor_showBox(&$edit_context, $html_text, $rows, $cols, $ew)
 {
-	global $wgOut;
-	$wgOut->addHtml('<link rel="stylesheet" type="text/css" media="screen" href="extensions/MeanEditor/wymeditor/styles.css" />
-	                 <link rel="stylesheet" type="text/css" media="screen" href="extensions/MeanEditor/wymeditor/skins/default/screen.css" />
-	                 <script type="text/javascript" src="extensions/MeanEditor/jquery/jquery.js"></script>
-	                 <script type="text/javascript" src="extensions/MeanEditor/wymeditor/jquery.wymeditor.pack.js.php"></script>');
+	global $wgOut, $wgArticlePath, $wgStylePath, $wgUploadPath;
+	wfLoadExtensionMessages('MeanEditor');
+	$sk = new Skin;
+	$wiki_path = str_replace('$1', '', $wgArticlePath);
+	$wgOut->addHtml('<script type="text/javascript" src="extensions/MeanEditor/wymeditor/jquery/jquery.js"></script>
+	                 <script type="text/javascript" src="extensions/MeanEditor/wymeditor/wymeditor/jquery.wymeditor.pack.js"></script>
+	                 <script type="text/javascript" src="extensions/MeanEditor/wymeditor/wymeditor/plugins/resizable/jquery.wymeditor.resizable.js"></script>');
 	$wgOut->addHtml('<script type="text/javascript">
-	                function responder(e)
-	                {
-					    div=document.getElementById(\'context_table\');
-	                    div.innerHTML=e.responseText;
-	                }
+			Array.prototype.wym_remove = function(from, to) {
+				// From a suggestion at forum.wymeditor.org
+				this.splice(from, !to || 1 + to - from + (!(to < 0 ^ from >= 0) && (to < 0 || -1) * this.length));
+				    return this.length;
+			};
 	                jQuery(function() {
 	                    jQuery(\'.wymeditor\').wymeditor({
-	                                html: "'.addcslashes($html_text,"\"\n").'",
-	                                stylesheet: \'styles.css\'
+					html: "'.addcslashes($html_text,"\"\n").'",
+					dialogLinkHtml: "<body class=\'wym_dialog wym_dialog_link\'"
+						+ " onload=\'WYMeditor.INIT_DIALOG(" + WYMeditor.INDEX + ")\'"
+						+ ">"
+						+ "<form>"
+						+ "<fieldset>"
+						+ "<input type=\'hidden\' class=\'wym_dialog_type\' value=\'"
+						+ WYMeditor.DIALOG_LINK
+						+ "\' />"
+						+ "<legend>{Link}</legend>"
+						+ "<div class=\'row\'>"
+						+ "<label>{URL}</label>"
+						+ "<input type=\'text\' class=\'wym_href\' value=\'\' size=\'40\' />"
+						+ "</div>"
+						+ "<div class=\'row row-indent\'>"
+						+ "<input class=\'wym_submit\' type=\'button\'"
+						+ " value=\'{Submit}\' />"
+						+ "<input class=\'wym_cancel\' type=\'button\'"
+						+ "value=\'{Cancel}\' />"
+						+ "</div>"
+						+ "</fieldset>"
+						+ "</form>"
+						+ "</body>",
+					dialogImageHtml:  "<body class=\'wym_dialog wym_dialog_image\'"
+						+ " onload=\'WYMeditor.INIT_DIALOG(" + WYMeditor.INDEX + ")\'"
+						+ ">' . preg_replace('/[\r\n]+/', "", str_replace('</script>','</scr"+"ipt>',str_replace('"','\\"',str_replace('\'','\\\'',$sk->makeGlobalVariablesScript(false))))) . '"
+						+ "<script type=\'text/javascript\' src=\''.$wgStylePath.'/common/ajax.js\'></scr"+"ipt>"
+						+ "<script type=\'text/javascript\'>function meaneditor_responder(e) {"
+						+ "	div=document.getElementById(\'meaneditor_ajax_table\');"
+						+ "	div.innerHTML=e.responseText;"
+						+ "}</scr"+"ipt>"
+						+ "<form>"
+						+ "<fieldset>"
+						+ "<input type=\'hidden\' class=\'wym_dialog_type\' value=\'"
+						+ WYMeditor.DIALOG_IMAGE
+						+ "\' />"
+						+ "<legend>{Image}</legend>"
+						+ "<div class=\'row\'>"
+						+ "<label>{Title}</label>"
+						+ "<input id=\'image_name\' type=\'text\' class=\'wym_src\' value=\'\' size=\'40\' />"
+						+ "</div>"
+						+ "<div class=\'row\'>"
+						+ "<p onclick=\'sajax_do_call(\"recent_images\",[0],meaneditor_responder,0);\'>' . wfMsg('recent_images_text',$wgArticlePath.'Special:Upload') . '</p>"
+						+ "<table id=\'meaneditor_ajax_table\'></table>"
+						+ "</div>"
+						+ "<div class=\'row row-indent\'>"
+						+ "<input class=\'wym_submit_meaneditor_image\' type=\'button\'"
+						+ " value=\'{Submit}\' />"
+						+ "<input class=\'wym_cancel\' type=\'button\'"
+						+ "value=\'{Cancel}\' />"
+						+ "</div>"
+						+ "</fieldset>"
+						+ "</form>"
+						+ "</body>",
+
+					preInit: function(wym) {
+						// Remove unwanted buttons, code from a suggestion at forum.wymeditor.org
+						wym._options.toolsItems.wym_remove(6);
+						wym._options.toolsItems.wym_remove(6);
+						wym._options.toolsItems.wym_remove(11);
+						wym._options.toolsItems.wym_remove(12);
+						wym._options.toolsItems.wym_remove(12);
+					},
+					postInit: function(wym) {
+						var wikilink_button_html = "<li class=\'wym_tools_wikilink\'>"
+							+ "<a name=\'Wikilink\' href=\'#\' "
+							+ "style=\'background-image: url(extensions/MeanEditor/wikilink-icon.png)\'>"
+							+ "Create Wikilink</a></li>";
+						var wikilink_dialog_html = "<body class=\'wym_dialog wym_dialog_wikilink\'"
+							+ " onload=\'WYMeditor.INIT_DIALOG(" + WYMeditor.INDEX + ")\'"
+							+ ">"
+							+ "<form>"
+							+ "<fieldset>"
+							+ "<input type=\'hidden\' class=\'wym_dialog_type\' value=\'"
+							+ "MeanEditor_dialog_wikilink"
+							+ "\' />"
+							+ "<legend>Wikilink</legend>"
+							+ "<div class=\'row\'>"
+							+ "<label>Page</label>"
+							+ "<input type=\'text\' class=\'wym_wikititle\' value=\'\' size=\'40\' />"
+							+ "</div>"
+							+ "<div class=\'row row-indent\'>"
+							+ "Tip: to link \"dog\" from \"dogs\", just select the first letters."
+							+ "</div>"
+							+ "<div class=\'row row-indent\'>"
+							+ "<input class=\'wym_submit wym_submit_wikilink\' type=\'button\'"
+							+ " value=\'{Submit}\' />"
+							+ "<input class=\'wym_cancel\' type=\'button\'"
+							+ "value=\'{Cancel}\' />"
+							+ "</div></fieldset></form></body>";
+
+						jQuery(wym._box).find(wym._options.toolsSelector + wym._options.toolsListSelector)
+							.append(wikilink_button_html);
+						jQuery(wym._box).find(\'li.wym_tools_wikilink a\').click(function() {
+							wym.dialog(\'Wikilink\', wikilink_dialog_html);
+							return (false);
+						});
+
+						wym.resizable();
+					},
+					preInitDialog: function(wym, wdm) {
+						if (wdm.jQuery(wym._options.dialogTypeSelector).val() != \'MeanEditor_dialog_wikilink\')
+							return;
+
+						var selected = wym.selected();
+
+						// Copied from Link dialog handling
+						if(selected && selected.tagName && selected.tagName.toLowerCase != WYMeditor.A)
+							selected = jQuery(selected).parentsOrSelf(WYMeditor.A);
+						if(!selected && wym._selected_image)
+							selected = jQuery(wym._selected_image).parentsOrSelf(WYMeditor.A);
+
+						var wikipage;
+						wikipage = jQuery(selected).attr(WYMeditor.HREF);
+						if (wikipage) {
+							if (wikipage.indexOf(\'' . $wiki_path . '\') == -1) {
+								alert(\'This is an external link. If you want to convert it to a wikilink, remove the existing link first.\');
+								wikipage = \'[External link, do not edit here]\';
+								wdm.close();
+							}
+							else wikipage = wikipage.slice(' . strlen($wiki_path) . ');
+						} else wikipage = wym._iframe.contentWindow.getSelection();
+						wdm.jQuery(\'.wym_wikititle\').val(wikipage);
+					},
+					postInitDialog: function(wym, wdw) {
+						var dbody = wdw.document.body;
+						wdw.jQuery(dbody).find(\'input.wym_submit_wikilink\').click(function() {
+							var wikipage = jQuery(dbody).find(\'.wym_wikititle\').val();
+							var sUrl = \'' . $wiki_path . '\' + wikipage;
+
+							// Copied from Link dialog handling
+							var sStamp = wym.uniqueStamp();
+							if(sUrl.length > 0) {
+								wym._exec(WYMeditor.CREATE_LINK, sStamp);
+								jQuery("a[@href=" + sStamp + "]", wym._doc.body)
+									.attr(WYMeditor.HREF, sUrl);
+							}
+							wdw.close();
+						});
+						wdw.jQuery(dbody).find(\'input.wym_submit_meaneditor_image\').click(function() {
+							var image_name = jQuery(dbody).find(wym._options.srcSelector).val();
+							var sUrl = \'' . $wgUploadPath . '/' . '\' + image_name;
+
+							// Copied from original dialog handling
+							var sStamp = wym.uniqueStamp();
+							if(sUrl.length > 0) {
+								wym._exec(WYMeditor.INSERT_IMAGE, sStamp);
+								jQuery("img[@src=" + sStamp + "]", wym._doc.body)
+									.attr(WYMeditor.SRC, sUrl)
+									.attr(WYMeditor.ALT, image_name);
+							}
+							wdw.close();
+						});
+					}
+
 	                    });
 	                });
 	                </script>');
@@ -269,13 +432,12 @@ function recent_images($rsargs)
 	for($i=0;$i<$res->numRows();$i++)
 	{
 		$ret=$res->fetchRow();
-#		$return_text=$return_text.'<tr><td><img src="'.$wgUploadPath.'/'.$ret['img_name'].'" height=100% width=100% onclick="div=document.getElementById(\'image_name\'); div.value=\''.$ret['img_name']+'\';" /></td></tr>';
-		$return_text=$return_text.'<tr><td><img src="'.$wgUploadPath.'/'.$ret['img_name'].'" height=100% width=100% onclick="div=document.getElementById(\'image_name\'); div.value=\''.$ret['img_name'].'\';" /></td></tr><tr><td>'.$ret['img_name'].'</td></tr>';
+		$return_text=$return_text.'<tr><td><img src="'.$wgUploadPath.'/'.$ret['img_name'].'" height="100px" width="100px" onclick="n=document.getElementById(\'image_name\'); n.value=\''.$ret['img_name'].'\';" /></td></tr><tr><td>'.$ret['img_name'].'</td></tr>';
 		$return_empty = false;
 	}
 	if ($return_empty) {
 		wfLoadExtensionMessages('MeanEditor');
-		return '<tr><td colspan="2"><strong>' . wfMsgWikiHtml('no_recent_images') . '</strong>' . ($u->isLoggedIn() ? '' : '<br />'. wfMsgWikiHtml('try_login')) . '</td></tr>';
+		return '<tr><td colspan="2"><strong>' . wfMsgWikiHtml('no_recent_images') . '</strong>' . ($u->isLoggedIn() ? '' : wfMsgWikiHtml('try_login')) . '</td></tr>';
 	} else return $return_text;
 }
 $wgAjaxExportList[] = "recent_images";

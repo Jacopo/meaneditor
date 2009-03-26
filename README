@@ -18,14 +18,14 @@ We designed MeanEditor with existing wikis (above all, Wikipedia) in mind. We ho
 If no advanced features are needed, MeanEditor is a good choice even for a single-editor wiki.
 
 === Installing using a downloaded file ===
-0) Install Mediawiki 1.14
+0) Install Mediawiki 1.15
 1) Unpack the tar in the MediaWiki install directory. This will create the extensions/MeanEditor directory.
 2) Disable $wgHashedUploadDirectory as suggested in LocalSettings.php
 3) Add to LocalSettings.php
  require_once( "$IP/extensions/MeanEditor/MeanEditor.php" );
 
 === Installing from the github repository ===
-0) Install Mediawiki 1.14 or later
+0) Install Mediawiki 1.15 or later
 1) create the extensions/MeanEditor directory and cd into it
 2) see <http://github.com/jacopo/meaneditor/> and clone from the repository. The "master" branch will usually have the most recent version, which might require an updated MediaWiki version from SVN. If the "master" code doesn't work look for a "mwNN" branch (e.g. "mw14" for MediaWiki 1.14.*).
 
@@ -50,6 +50,7 @@ Right now we support:
 * Simple lists (no nesting)
 * Bold and italic
 * References (write support is very limited)
+* Superscripts and Subscripts
 
 To be implemented:
 * Better reference support
