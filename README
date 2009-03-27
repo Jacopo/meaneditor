@@ -26,8 +26,11 @@ If no advanced features are needed, MeanEditor is a good choice even for a singl
 
 === Installing from the github repository ===
 0) Install Mediawiki 1.15 or later
-1) create the extensions/MeanEditor directory and cd into it
-2) see <http://github.com/jacopo/meaneditor/> and clone from the repository. The "master" branch will usually have the most recent version, which might require an updated MediaWiki version from SVN. If the "master" code doesn't work look for a "mwNN" branch (e.g. "mw14" for MediaWiki 1.14.*).
+1) cd into the extensions directory
+2) see <http://github.com/jacopo/meaneditor/> and clone from the repository. The directory *must* be called MeanEditor. Try:
+     git clone git://github.com/Jacopo/meaneditor.git MeanEditor.
+
+The "master" branch will usually have the most recent version, which might require an updated MediaWiki version from SVN. If the "master" code doesn't work look for a "mwNN" branch (e.g. "mw14" for MediaWiki 1.14.*).
 
 === Details ===
 MeanEditor is best described as "A quick and dirty hack with a couple of interesting properties". It supports only a very limited subset of the Wiki language, but does its job right. (Well, it tries)
