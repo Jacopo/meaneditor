@@ -209,6 +209,9 @@ function meaneditor_html2wiki($article, $user, &$edit_context, &$html_text)
 	$html_text=preg_replace_callback('/<img alt="(.*?)" src="(.*?)" \/>/',create_function('$matches',
 		'return "[[Image:".$matches[1]."]]";'
 	),$html_text);
+	$html_text=preg_replace_callback('/<img src="(.*?)" alt="(.*?)" \/>/',create_function('$matches',
+		'return "[[Image:".$matches[2]."]]";'
+	),$html_text);
 
 
 	# TODO: integrate lists with the previous paragraph? Check XHTML requirements
