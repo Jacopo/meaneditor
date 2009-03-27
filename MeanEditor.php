@@ -240,7 +240,7 @@ function meaneditor_html2wiki($article, $user, &$edit_context, &$html_text)
 
 function meaneditor_showBox(&$edit_context, $html_text, $rows, $cols, $ew)
 {
-	global $wgOut, $wgArticlePath, $wgStylePath, $wgUploadPath;
+	global $wgOut, $wgArticlePath, $wgStylePath, $wgUploadPath, $wgLang;
 	wfLoadExtensionMessages('MeanEditor');
 	$sk = new Skin;
 	$wiki_path = str_replace('$1', '', $wgArticlePath);
@@ -257,6 +257,7 @@ function meaneditor_showBox(&$edit_context, $html_text, $rows, $cols, $ew)
 	                jQuery(function() {
 	                    jQuery(\'.wymeditor\').wymeditor({
 					html: "'.addcslashes($html_text,"\"\n").'",
+					lang: "'.$wgLang->getCode().'",
 					iframeBasePath: "extensions/MeanEditor/iframe/",
 					dialogLinkHtml: "<body class=\'wym_dialog wym_dialog_link\'"
 						+ " onload=\'WYMeditor.INIT_DIALOG(" + WYMeditor.INDEX + ")\'"
