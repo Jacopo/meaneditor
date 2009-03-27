@@ -17,7 +17,8 @@ $wgExtensionCredits['other'][] = array(
 	'author' => 'Jacopo Corbetta and Alessandro Pignotti for Antonio Gulli',
 	'description' => 'The mean, the safe and the ugly visual editor for non-technical users. Based on WYMeditor and jQuery.',
 	'descriptionmsg' => 'meaneditor_desc',
-	'url' => 'http://www.mediawiki.org/wiki/Extension:MeanEditor'
+	'url' => 'http://www.mediawiki.org/wiki/Extension:MeanEditor',
+	'version' => '0.5.1'
 );
 
 
@@ -246,6 +247,7 @@ function meaneditor_showBox(&$edit_context, $html_text, $rows, $cols, $ew)
 	$wgOut->addHtml('<script type="text/javascript" src="extensions/MeanEditor/wymeditor/jquery/jquery.js"></script>
 	                 <script type="text/javascript" src="extensions/MeanEditor/wymeditor/wymeditor/jquery.wymeditor.pack.js"></script>
 	                 <script type="text/javascript" src="extensions/MeanEditor/wymeditor/wymeditor/plugins/resizable/jquery.wymeditor.resizable.js"></script>');
+	$wgOut->addHtml('<link rel="stylesheet" href="extensions/MeanEditor/fix_meaneditor.css" type="text/css" />');
 	$wgOut->addHtml('<script type="text/javascript">
 			Array.prototype.wym_remove = function(from, to) {
 				// From a suggestion at forum.wymeditor.org
@@ -255,6 +257,7 @@ function meaneditor_showBox(&$edit_context, $html_text, $rows, $cols, $ew)
 	                jQuery(function() {
 	                    jQuery(\'.wymeditor\').wymeditor({
 					html: "'.addcslashes($html_text,"\"\n").'",
+					iframeBasePath: "extensions/MeanEditor/iframe/",
 					dialogLinkHtml: "<body class=\'wym_dialog wym_dialog_link\'"
 						+ " onload=\'WYMeditor.INIT_DIALOG(" + WYMeditor.INDEX + ")\'"
 						+ ">"

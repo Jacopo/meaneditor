@@ -18,7 +18,7 @@ We designed MeanEditor with existing wikis (above all, Wikipedia) in mind. We ho
 If no advanced features are needed, MeanEditor is a good choice even for a single-editor wiki.
 
 === Installing using a downloaded file ===
-0) Install Mediawiki 1.15
+0) Install the recommended version of Mediawiki
 1) Unpack the tar in the MediaWiki install directory. This will create the extensions/MeanEditor directory.
 2) Disable $wgHashedUploadDirectory as suggested in LocalSettings.php
 3) Add to LocalSettings.php
@@ -60,6 +60,7 @@ To be implemented:
 * Preserving original code whitespace to leave a very clean diff (but some changes may be desirable, check what current bots automatically correct)
 * Make "Magic" links like http://www.example.com clickable?
 * Standard bibliography
+* make references_here, __TOC__ and _autonumber_ links visually stand out
 * LaTeX formula editing (TODO: just edit the LaTeX code? Or MathML for visual editing?)
 
 To be implemented only for display:
