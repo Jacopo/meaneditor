@@ -217,7 +217,7 @@ function meaneditor_html2wiki($article, $user, &$edit_context, &$html_text)
 	# TODO: integrate lists with the previous paragraph? Check XHTML requirements
 	$html_text=preg_replace_callback('/<ol>(.*?)<\/ol>/',create_function('$matches',
 		'$matches[1]=str_replace("<li>","# ",$matches[1]);
-		return str_replace("</li>","",$matches[1])."\n";'),$html_text);
+		return str_replace("</li>","\n",$matches[1])."\n";'),$html_text);
 	$html_text=preg_replace_callback('/<ul>(.*?)<\/ul>/',create_function('$matches',
 		'$matches[1]=str_replace("<li>","* ",$matches[1]);
 		return str_replace("</li>","\n",$matches[1])."\n";'),$html_text);
