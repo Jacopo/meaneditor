@@ -247,11 +247,12 @@ function meaneditor_showBox(&$edit_context, $html_text, $rows, $cols, $ew)
 	wfLoadExtensionMessages('MeanEditor');
 	$sk = new Skin;
 	$wiki_path = str_replace('$1', '', $wgArticlePath);
-	$wgOut->addHtml('<script type="text/javascript" src="extensions/MeanEditor/wymeditor/jquery/jquery.js"></script>
-	                 <script type="text/javascript" src="extensions/MeanEditor/wymeditor/wymeditor/jquery.wymeditor.pack.js"></script>
-	                 <script type="text/javascript" src="extensions/MeanEditor/wymeditor/wymeditor/plugins/resizable/jquery.wymeditor.resizable.js"></script>');
-	$wgOut->addHtml('<link rel="stylesheet" href="extensions/MeanEditor/fix_meaneditor.css" type="text/css" />');
-	$wgOut->addHtml('<script type="text/javascript">
+	$wgOut->addScriptFile('../../extensions/MeanEditor/wymeditor/jquery/jquery.js');
+	$wgOut->addScriptFile('../../extensions/MeanEditor/wymeditor/wymeditor/jquery.wymeditor.pack.js');
+	$wgOut->addScriptFile('../../extensions/MeanEditor/wymeditor/wymeditor/plugins/resizable/jquery.wymeditor.resizable.js');
+	$wgOut->addExtensionStyle('../extensions/MeanEditor/fix_meaneditor.css');
+	$wgOut->addMeta('X-UA-Compatible', 'IE=7');
+	$wgOut->addInlineScript('
 			Array.prototype.wym_remove = function(from, to) {
 				// From a suggestion at forum.wymeditor.org
 				this.splice(from, !to || 1 + to - from + (!(to < 0 ^ from >= 0) && (to < 0 || -1) * this.length));
@@ -418,7 +419,7 @@ function meaneditor_showBox(&$edit_context, $html_text, $rows, $cols, $ew)
 
 	                    });
 	                });
-	                </script>');
+	');
 	$wgOut->addHTML( <<<END
 <textarea tabindex='1' accesskey="," name="wpTextbox1" id="wpTextbox1" class="wymeditor" rows='{$rows}'
 cols='{$cols}'{$ew}></textarea>
