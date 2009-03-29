@@ -346,9 +346,10 @@ class MeanEditorEditPage extends EditPage {
 				'[[' . wfMsgForContent( 'copyrightpage' ) . ']]' );
 		}
 
+		/* MeanEditor: always disable the toolbar */
 		if ( $wgUser->getOption('showtoolbar') and !$this->isCssJsSubpage ) {
 			# prepare toolbar for edit buttons
-			$toolbar = EditPage::getEditToolbar();
+			$toolbar = '';
 		} else {
 			$toolbar = '';
 		}

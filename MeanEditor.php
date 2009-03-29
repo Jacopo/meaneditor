@@ -251,7 +251,10 @@ function meaneditor_showBox(&$edit_context, $html_text, $rows, $cols, $ew)
 	$wgOut->addScriptFile('../../extensions/MeanEditor/wymeditor/wymeditor/jquery.wymeditor.pack.js');
 	$wgOut->addScriptFile('../../extensions/MeanEditor/wymeditor/wymeditor/plugins/resizable/jquery.wymeditor.resizable.js');
 	$wgOut->addExtensionStyle('../extensions/MeanEditor/fix_meaneditor.css');
-	$wgOut->addMeta('X-UA-Compatible', 'IE=7');
+	
+	# For now, it looks better in IE8 standards mode, even though IE support is very messy
+	#$wgOut->addMeta('X-UA-Compatible', 'IE=7');
+	
 	$wgOut->addInlineScript('
 			Array.prototype.wym_remove = function(from, to) {
 				// From a suggestion at forum.wymeditor.org
