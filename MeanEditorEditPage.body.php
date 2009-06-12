@@ -61,6 +61,11 @@ class MeanEditorEditPage extends EditPage {
 				}
 			}
 		}
+		
+		// If they used redlink=1 and the page exists, redirect to the main article
+		if ( $wgRequest->getBool( 'redlink' ) && $this->mTitle->exists() ) {
+			$wgOut->redirect( $this->mTitle->getFullURL() );
+		}
 
 		wfProfileIn( __METHOD__."-business-end" );
 
@@ -79,7 +84,6 @@ class MeanEditorEditPage extends EditPage {
 
 		# Optional notices on a per-namespace and per-page basis
 		$editnotice_ns   = 'editnotice-'.$this->mTitle->getNamespace();
-		$editnotice_page = $editnotice_ns.'-'.$this->mTitle->getDBkey();
 		if ( !wfEmptyMsg( $editnotice_ns, wfMsgForContent( $editnotice_ns ) ) ) {
 			$wgOut->addWikiText( wfMsgForContent( $editnotice_ns )  );
 		}
@@ -92,8 +96,6 @@ class MeanEditorEditPage extends EditPage {
 					$wgOut->addWikiText( wfMsgForContent( $editnotice_base )  );
 				}
 			}
-		} else if ( !wfEmptyMsg( $editnotice_page, wfMsgForContent( $editnotice_page ) ) ) {
-			$wgOut->addWikiText( wfMsgForContent( $editnotice_page ) );
 		}
 		
 		# MeanEditor: always use traditional editing for these strange things
@@ -194,7 +196,7 @@ class MeanEditorEditPage extends EditPage {
 		$wgOut->setArticleRelated( true );
 
 		if ( $this->isConflict ) {
-			$wgOut->addWikiMsg( 'explainconflict' );
+			$wgOut->wrapWikiMsg( "<div class='mw-explainconflict'>\n$1</div>", 'explainconflict' );
 
 			$this->textbox2 = $this->textbox1;
 			$this->textbox1 = $this->getContent();
@@ -217,7 +219,7 @@ class MeanEditorEditPage extends EditPage {
 			}
 
 			if ( $this->missingComment ) {
-				$wgOut->wrapWikiMsg( '<div id="mw-missingcommenttext">$1</div>',  'missingcommenttext' );
+				$wgOut->wrapWikiMsg( '<div id="mw-missingcommenttext">$1</div>', 'missingcommenttext' );
 			}
 
 			if ( $this->missingSummary && $this->section != 'new' ) {
@@ -239,9 +241,9 @@ class MeanEditorEditPage extends EditPage {
 			// Let sysop know that this will make private content public if saved
 
 				if ( !$this->mArticle->mRevision->userCan( Revision::DELETED_TEXT ) ) {
-					$wgOut->addWikiMsg( 'rev-deleted-text-permission' );
+					$wgOut->wrapWikiMsg( "<div class='mw-warning plainlinks'>\n$1</div>\n", 'rev-deleted-text-permission' );
 				} else if ( $this->mArticle->mRevision->isDeleted( Revision::DELETED_TEXT ) ) {
-					$wgOut->addWikiMsg( 'rev-deleted-text-view' );
+					$wgOut->wrapWikiMsg( "<div class='mw-warning plainlinks'>\n$1</div>\n", 'rev-deleted-text-view' );
 				}
 
 				if ( !$this->mArticle->mRevision->isCurrent() ) {
@@ -272,8 +274,6 @@ class MeanEditorEditPage extends EditPage {
 
 		$classes = array(); // Textarea CSS
 		if ( $this->mTitle->getNamespace() == NS_MEDIAWIKI ) {
-			# Show a warning if editing an interface message
-			$wgOut->wrapWikiMsg( "<div class='mw-editinginterface'>\n$1</div>", 'editinginterface' );
 		} elseif ( $this->mTitle->isProtected( 'edit' ) ) {
 			# Is the title semi-protected?
 			if ( $this->mTitle->isSemiProtected() ) {
@@ -405,10 +405,14 @@ class MeanEditorEditPage extends EditPage {
 		if ( $this->section == 'new' ) {
 			$commentsubject = '';
 			if ( !$wgRequest->getBool( 'nosummary' ) ) {
+				# Add a class if 'missingsummary' is triggered to allow styling of the summary line
+				$summaryClass = $this->missingSummary ? 'mw-summarymissed' : 'mw-summary';
+
 				$commentsubject =
 					Xml::tags( 'label', array( 'for' => 'wpSummary' ), $subject );
 				$commentsubject =
-					Xml::tags( 'span', array( 'id' => 'wpSummaryLabel' ), $commentsubject );
+					Xml::tags( 'span', array( 'class' => $summaryClass, 'id' => "wpSummaryLabel" ),
+						$commentsubject );
 				$commentsubject .= '&nbsp;';
 				$commentsubject .= Xml::input( 'wpSummary',
 									60,
@@ -427,10 +431,13 @@ class MeanEditorEditPage extends EditPage {
 		} else {
 			$commentsubject = '';
 
+			# Add a class if 'missingsummary' is triggered to allow styling of the summary line
+			$summaryClass = $this->missingSummary ? 'mw-summarymissed' : 'mw-summary';
+
 			$editsummary = Xml::tags( 'label', array( 'for' => 'wpSummary' ), $summary );
-			$editsummary =
-				Xml::tags( 'span', array( 'id' => 'wpSummaryLabel' ), $editsummary ) . ' ';
-				
+			$editsummary = Xml::tags( 'span',  array( 'class' => $summaryClass, 'id' => "wpSummaryLabel" ),
+					$editsummary ) . ' ';
+
 			$editsummary .= Xml::input( 'wpSummary',
 				60,
 				$summarytext,
@@ -487,7 +494,7 @@ class MeanEditorEditPage extends EditPage {
 		if ( $this->wasDeletedSinceLastEdit() ) {
 			if ( 'save' != $this->formtype ) {
 				$wgOut->wrapWikiMsg(
-					'<div class="error mw-deleted-while-editing">$1</div>',
+					"<div class='error mw-deleted-while-editing'>\n$1</div>",
 					'deletedwhileediting' );
 			} else {
 				// Hide the toolbar and edit area, user can click preview to get it back
