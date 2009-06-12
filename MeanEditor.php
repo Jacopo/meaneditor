@@ -386,7 +386,12 @@ function meaneditor_showBox(&$edit_context, $html_text, $rows, $cols, $ew)
 								wdm.close();
 							}
 							else wikipage = wikipage.slice(' . strlen($wiki_path) . ');
-						} else wikipage = wym._iframe.contentWindow.getSelection();
+						} else if (wym._iframe.contentWindow.getSelection) {
+							wikipage = wym._iframe.contentWindow.getSelection().toString();
+						} else if (wym._iframe.contentWindow.document.selection && wym._iframe.contentWindow.document.selection.createRange) {
+							var range = wym._iframe.contentWindow.document.selection.createRange();
+							wikipage = range.text;
+						}
 						wdm.jQuery(\'.wym_wikititle\').val(wikipage);
 					},
 					postInitDialog: function(wym, wdw) {
