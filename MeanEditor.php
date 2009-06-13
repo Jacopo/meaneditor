@@ -18,7 +18,7 @@ $wgExtensionCredits['other'][] = array(
 	'description' => 'The mean, the safe and the ugly visual editor for non-technical users. Based on WYMeditor and jQuery.',
 	'descriptionmsg' => 'meaneditor_desc',
 	'url' => 'http://www.mediawiki.org/wiki/Extension:MeanEditor',
-	'version' => '0.5.1'
+	'version' => '0.5.2'
 );
 
 
