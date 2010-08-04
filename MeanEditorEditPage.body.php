@@ -194,13 +194,15 @@ class MeanEditorEditPage extends EditPage {
 	# Mediawiki 1.16 implements almost exactly the hook we need here.
 	# They even automatically disable the visual editor on conflicts. Thanks guys!
 	function showContentForm() {
+		global $wgUser, $wgOut;
+
 		# User preference
 		if ( $wgUser->getOption( 'prefer_traditional_editor' ) ) {
 			$this->userWantsTraditionalEditor = true;
 		}
 		
 		# Should be redundant, but check just in case
-		if ( $this->isConflict() || $this->diff || wfReadOnly() ) {
+		if ( $this->diff || wfReadOnly() ) {
 			$this->noVisualEditor = true;
 		}
 
