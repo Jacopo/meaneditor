@@ -18,7 +18,7 @@ $wgExtensionCredits['other'][] = array(
 	'description' => 'The mean, the safe and the ugly visual editor for non-technical users. Based on WYMeditor and jQuery.',
 	'descriptionmsg' => 'meaneditor_desc',
 	'url' => 'http://www.mediawiki.org/wiki/Extension:MeanEditor',
-	'version' => '0.5.2'
+	'version' => '0.5.3'
 );
 
 
@@ -492,8 +492,6 @@ function meaneditor_checkboxes(&$editpage, &$checkboxes, &$tabindex)
 		"&nbsp;<label for='wpWantTraditionalEditor'>" . wfMsg('checkbox_force_traditional') . "</label>";
 	return true;
 }
-
-
 
 $wgHooks['EditPage::wiki2html'][] = 'meaneditor_wiki2html';
 $wgHooks['EditPage::html2wiki'][] = 'meaneditor_html2wiki';
