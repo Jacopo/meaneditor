@@ -493,8 +493,15 @@ function meaneditor_checkboxes(&$editpage, &$checkboxes, &$tabindex)
 	return true;
 }
 
+function meaneditor_disabletoolbar(&$toolbar)
+{
+	$toolbar = '';
+	return false;
+}
+
 $wgHooks['EditPage::wiki2html'][] = 'meaneditor_wiki2html';
 $wgHooks['EditPage::html2wiki'][] = 'meaneditor_html2wiki';
 $wgHooks['EditPage::showBox'][] = 'meaneditor_showBox';
 $wgHooks['CustomEditor'][] = 'meaneditor_customeditor';
 $wgHooks['EditPageBeforeEditChecks'][] = 'meaneditor_checkboxes';
+$wgHooks['EditPageBeforeEditToolbar'][] = 'meaneditor_disabletoolbar';
