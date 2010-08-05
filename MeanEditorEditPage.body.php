@@ -179,13 +179,16 @@ class MeanEditorEditPage extends EditPage {
 	 * visual editor was used or not
 	 */
 	function importFormData( &$request ) {
+		global $wgUser;
+
 		if ( $request->wasPosted() ) {
-			# MeanEditor: take note if the visual editor was used or not
+			# Reuse values from the previous submission
 			$this->noVisualEditor = $request->getVal( 'wpNoVisualEditor' );
 			$this->userWantsTraditionalEditor = $request->getCheck( 'wpWantTraditionalEditor' );
 		} else {
+			# Default values
 			$this->noVisualEditor = false;
-			$this->userWantsTraditionalEditor = false;
+			$this->userWantsTraditionalEditor = $wgUser->getOption('prefer_traditional_editor');
 		}
 
 		return parent::importFormData($request);
@@ -194,13 +197,8 @@ class MeanEditorEditPage extends EditPage {
 	# Mediawiki 1.16 implements almost exactly the hook we need here.
 	# They even automatically disable the visual editor on conflicts. Thanks guys!
 	function showContentForm() {
-		global $wgUser, $wgOut;
+		global $wgOut;
 
-		# User preference
-		if ( $wgUser->getOption( 'prefer_traditional_editor' ) ) {
-			$this->userWantsTraditionalEditor = true;
-		}
-		
 		# Should be redundant, but check just in case
 		if ( $this->diff || wfReadOnly() ) {
 			$this->noVisualEditor = true;

@@ -488,7 +488,7 @@ function meaneditor_checkboxes(&$editpage, &$checkboxes, &$tabindex)
 		'id'        => 'wpWantTraditionalEditor',
 	);
 	$checkboxes['want_traditional_editor'] =
-		Xml::check( 'wpWantTraditionalEditor', $checked['want_traditional_editor'], $attribs ) .
+		Xml::check( 'wpWantTraditionalEditor', $editpage->userWantsTraditionalEditor, $attribs ) .
 		"&nbsp;<label for='wpWantTraditionalEditor'>" . wfMsg('checkbox_force_traditional') . "</label>";
 	return true;
 }
