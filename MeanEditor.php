@@ -1,12 +1,12 @@
 <?php
 # Alert the user that this is not a valid entry point to MediaWiki if they try to access the skin file directly.
-if (!defined('MEDIAWIKI') || $wgHashedUploadDirectory)
+if (!defined('MEDIAWIKI'))
 {
 	echo <<<EOT
-	To install the MeanEditor extension disable wgHashedUploadDirectory and put the following line in LocalSettings.php:
+	To install the MeanEditor extension put the following line in LocalSettings.php:
 	require_once( "$IP/extensions/MeanEditor/MeanEditor.php" );
 	
-	See README-MeanEditor.txt for more information (if your wiki is not reached through /mediawiki you will need to make some changes).
+	See README for more information.
 EOT;
 	         exit( 1 );
 }
@@ -21,6 +21,19 @@ $wgExtensionCredits['other'][] = array(
 	'version' => '0.5.4'
 );
 
+function substitute_hashed_img_urls($text)
+{
+	while (preg_match('/\[\[Image:(.*?)\]\]/', $text, $matches)) {
+		$img = $matches[1];
+		$hash = md5($img);
+		$folder = substr($hash, 0, 1) . 
+			'/' . substr($hash, 0, 2);
+		$tag = '<img alt="' . $img . '" src="' . $wgUploadPath .
+			'/' . $folder . '/' . $img . '" />';
+		$text = str_replace($matches[0], $tag, $text);
+	}
+	return $text;
+}
 
 function deny_visual_because_of($reason, &$edit_context)
 {
@@ -101,7 +114,12 @@ function meaneditor_wiki2html($article, $user, &$edit_context, &$wiki_text)
 	$wiki_text=preg_replace('/(?:<p>|)\s*==(.*?)==\s*(?:<\/p>|)/','<h2>\1</h2>',$wiki_text);
 
 	#Substitute [[Image:a]]
-	#FIXME: do not require $wgHashedUploadDirectory	= false
+	if (!$wgHashedUploadDirectory) {
+		$wiki_text=preg_replace('/\[\[Image:(.*?)\]\]/','<img alt="\1" src="' . $wgUploadPath . '/\1" />',$wiki_text);
+	} else {
+		$wiki_text = substitute_hashed_img_urls($wiki_text);
+	}
+
 	$wiki_text=preg_replace('/\[\[Image:(.*?)\]\]/','<img alt="\1" src="' . $wgUploadPath . '/\1" />',$wiki_text);
 
 	#Create [[a|b]] syntax for every link

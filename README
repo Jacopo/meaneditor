@@ -20,8 +20,7 @@ If no advanced features are needed, MeanEditor is a good choice even for a singl
 === Installing using a downloaded file ===
 0) Install the recommended version of Mediawiki
 1) Unpack the tar in the MediaWiki install directory. This will create the extensions/MeanEditor directory.
-2) Disable $wgHashedUploadDirectory as suggested in LocalSettings.php
-3) Add to LocalSettings.php
+2) Add to LocalSettings.php
  require_once( "$IP/extensions/MeanEditor/MeanEditor.php" );
 
 === Installing from the github repository ===
@@ -29,8 +28,7 @@ If no advanced features are needed, MeanEditor is a good choice even for a singl
 1) cd into the extensions directory
 2) see <http://github.com/jacopo/meaneditor/> and clone from the repository. The directory *must* be called MeanEditor. Try:
      git clone git://github.com/Jacopo/meaneditor.git MeanEditor.
-3) Disable $wgHashedUploadDirectory as suggested in LocalSettings.php
-4) Add to LocalSettings.php
+3) Add to LocalSettings.php
  require_once( "$IP/extensions/MeanEditor/MeanEditor.php" );
 
 The "master" branch will usually have the most recent version. If the "master" code doesn't work, look for a "mwNN" branch (e.g. "mw14" for MediaWiki 1.14.*).
@@ -43,6 +41,8 @@ It is an adaptation of [http://wymeditor.org WYMeditor], a semantic editor for s
 MeanEditor refuses to modify markup it does not understand and strives to preserve the original page intact. Ideally, edits made with MeanEditor should be indistinguishable from manual edits. If anything, a visual editor for Wikipedia should not create additional work for administrators.
 
 In the current version, redundant whitespace is sometimes removed and some characters are replaced with numerical entities. Other than that, MeanEditor leaves a very clean diff.
+
+Image support assumes you are using the standard local repository. MeanEditor used to require disabling hashed upload directories, but thanks to Ken Bateman it now works out of the box.
 
 === Supported markup ===
 This list should certainly grow, but not indiscriminately. We feel the wiki community should decide what should be implemented in the visual editor and what should be left out.
