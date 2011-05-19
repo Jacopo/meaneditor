@@ -12,7 +12,7 @@ $messages['en'] = array(
 	'reason_forbidden_char' => 'Found a <b>$1</b>. Sounds like an unsupported feature.',
 	'reason_special_link' => 'Special wikilinks like <b>$1</b> are not supported.',
 	'checkbox_force_traditional' => 'Force traditional code editing',
-	'recent_images_text' => 'Click <b>here</b> to show images you recently uploaded or type the name of the image. You can also <a href=\'$1\' target=\'_blank\'>upload a new image</a>'
+	'recent_images_text' => 'Choose one of the images you recently uploaded or type the name of the image. You can also <a href=\'$1\' target=\'_blank\'>upload a new image</a>'
 );
 $messages['de'] = array( 
 	'prefer_traditonal_editor' => 'Den visuellen Editor nicht benutzen.',
@@ -26,5 +26,5 @@ $messages['de'] = array(
 	'reason_forbidden_char' => '<b>$1</b> gefunden. Vermutlich eine nicht unterstützte Funktion.',
 	'reason_special_link' => 'Spezielle Wikilinks wie <b>$1</b> werden nicht unterstützt.',
 	'checkbox_force_traditional' => 'Traditionelle Bearbeitung erzwingen.',
-	'recent_images_text' => 'Klicke <b>hier</b> um Bilder die kürzlich hochgeladen wurden anzuzeigen oder tippe den Namen eines Bildes. Du kannst auch <a href=\'$1\' target=\'_blank\'>ein neues Bild hochladen.</a>'
+	'recent_images_text' => 'Wählen eine der Bilder die Du kürzlich hochgeladen oder tippe den Namen eines Bildes. Du kannst auch <a href=\'$1\' target=\'_blank\'>ein neues Bild hochladen.</a>'
 );
